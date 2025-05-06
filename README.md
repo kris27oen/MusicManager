@@ -2,7 +2,7 @@
 
 This project uses AutoGen with Gemini Pro to generate song lyrics based on user input. It demonstrates how to set up and run a conversational AI agent that creates customized lyrics.
 
-[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://chatbot-template.streamlit.app/)
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://github.com/gelicheng/autogen_lyrics)
 
 ## 🚀 Features
 
