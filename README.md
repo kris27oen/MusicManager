@@ -34,5 +34,5 @@ pip install -r requirements.txt
 ```
 
 4. **Replace your APIs**
-Update the autogen_spotify_app.py file with your Spotify API keys.
-Update the config.json file with your Gemini API key. Make sure that your API key is compatible with the Gemini model being used. 
+
+Update the autogen_spotify_app.py file with your Spotify API keys. Update the config.json file with your Gemini API key. Make sure that your API key is compatible with the Gemini model being used. 
