@@ -24,8 +24,8 @@ with st.sidebar:
     
     # API Keys
     with st.expander("API Configuration"):
-        spotify_client_id = st.text_input("Spotify Client ID", value="7e506b1a8964420b8ce8b76e3d791acc", type="password")
-        spotify_client_secret = st.text_input("Spotify Client Secret", value="2e10e4d49112499c9b8ff11ee361c91d", type="password")
+        spotify_client_id = st.text_input("Spotify Client ID", value="YOUR_API_KEY", type="password")
+        spotify_client_secret = st.text_input("Spotify Client Secret", value="YOUR_API_KEY", type="password")
         gemini_api_key = st.text_input("Gemini API Key", type="password")
         
         if st.button("Save API Keys"):

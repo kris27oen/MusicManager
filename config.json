@@ -2,7 +2,7 @@
     "config_list": [
         {
             "model": "gemini-1.5-pro-001",
-            "api_key": "AIzaSyATmNRhZzJhH062Nb3C6T4djEgehbNKLQI"
+            "api_key": "YOUR_API_KEY"
         }
     ]
 }
