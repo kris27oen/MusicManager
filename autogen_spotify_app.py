@@ -3,14 +3,16 @@ import requests
 import re
 import time
 import autogen
-import google.generativeai as genai
 from typing import Dict, List, Optional, Union, Any
 import os
 import json
+import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from gemini_adapter import GeminiLLM
+from openai import OpenAI
 from autogen import AssistantAgent, UserProxyAgent, GroupChat, GroupChatManager
+from wordcloud import WordCloud
+from textblob import TextBlob
 
 # Title and page configuration
 st.set_page_config(page_title="Spotify Lyrics Analyzer with Autogen", layout="wide")
@@ -24,9 +26,9 @@ with st.sidebar:
     
     # API Keys
     with st.expander("API Configuration"):
-        spotify_client_id = st.text_input("Spotify Client ID", value="YOUR_API_KEY", type="password")
-        spotify_client_secret = st.text_input("Spotify Client Secret", value="YOUR_API_KEY", type="password")
-        gemini_api_key = st.text_input("Gemini API Key", type="password")
+        spotify_client_id = st.text_input("Spotify Client ID", value="b9e0979d54c449d4a1b7f23a1be1d329", type="password")
+        spotify_client_secret = st.text_input("Spotify Client Secret", value="03559d2dc6b643e8af412d5930ee4ec2", type="password")
+        gemini_api_key = st.text_input("Gemini API Key", value="AIzaSyBT-j55lWkh5Mz9_RrSwpCaaagDPcCDjpI", type="password")
         
         if st.button("Save API Keys"):
             st.success("API keys saved!")
@@ -36,8 +38,9 @@ with st.sidebar:
                 config = {
                     "config_list": [
                         {
-                            "model": "gemini-1.5-pro-001",
-                            "api_key": gemini_api_key
+                            "model": "gemini-2.0-flash-lite",
+                            "api_key": gemini_api_key,
+                            "base_url": "https://generativelanguage.googleapis.com/v1beta/"
                         }
                     ]
                 }
@@ -110,13 +113,71 @@ def get_lyrics(artist, title):
     except Exception:
         return None
 
+# Function to generate wordcloud 
+def generate_wordcloud(text):
+    wordcloud = WordCloud(width=800, height=800, background_color='white').generate(text)
+    return wordcloud
+
+def compute_sentiment_scores(lyrics):
+    sentiments = {"positive": 0, "neutral": 0, "negative": 0}
+    count = 0
+
+    blob = TextBlob(lyrics)
+    polarity = blob.sentiment.polarity
+    subjectivity = blob.sentiment.subjectivity
+
+    # Heuristic mapping of emotions based on polarity/subjectivity
+    mood = {
+        "joy": 0,
+        "sadness": 0,
+        "anger": 0,
+        "fear": 0,
+        "love": 0,
+        "surprise": 0
+    }
+
+    if polarity >= 0.4:
+        mood["joy"] += 1
+        if subjectivity > 0.6:
+            mood["love"] += 1
+    elif polarity <= -0.4:
+        mood["sadness"] += 1
+        if subjectivity > 0.5:
+            mood["anger"] += 1
+    elif -0.4 < polarity < 0.4:
+        if subjectivity < 0.3:
+            mood["fear"] += 1
+        elif subjectivity > 0.6:
+            mood["surprise"] += 1
+
+    return mood
+
+def plot_mood_radar(mood_dict):
+    labels = list(mood_dict.keys())
+    values = list(mood_dict.values())
+
+    angles = np.linspace(0, 2 * np.pi, len(labels), endpoint=False).tolist()
+    values += values[:1]
+    angles += angles[:1]  # to close the circle
+
+    fig, ax = plt.subplots(figsize=(4, 4), subplot_kw=dict(polar=True))
+    ax.plot(angles, values, linewidth=2)
+    ax.fill(angles, values, alpha=0.3)
+    ax.set_yticklabels([])
+    ax.set_xticks(angles[:-1])
+    ax.set_xticklabels(labels)
+
+    return fig
+
+
 def setup_autogen_agents(gemini_api_key):
-    gemini_llm = GeminiLLM(api_key=gemini_api_key)
+    gemini_llm = OpenAI(api_key=gemini_api_key, base_url="https://generativelanguage.googleapis.com/v1beta/")
+    
 
     playlist_agent_config = {
         "name": "playlist_agent",
         "llm_config": {
-            "config_list": [{"model": "gemini-1.5-pro-001", "api_key": gemini_api_key}],
+            "config_list": [{"model": "gemini-2.0-flash-lite", "api_key": gemini_api_key, "base_url": "https://generativelanguage.googleapis.com/v1beta/"}],
             "cache_seed": 42
         },
         "system_message": """You are a Playlist Agent specialized in extracting and organizing data 
@@ -128,7 +189,7 @@ def setup_autogen_agents(gemini_api_key):
     lyrics_agent_config = {
         "name": "lyrics_agent",
         "llm_config": {
-            "config_list": [{"model": "gemini-1.5-pro-001", "api_key": gemini_api_key}],
+            "config_list": [{"model": "gemini-2.0-flash-lite", "api_key": gemini_api_key, "base_url": "https://generativelanguage.googleapis.com/v1beta/"}],
             "cache_seed": 42
         },
         "system_message": """You are a Lyrics Analysis Agent specialized in analyzing song lyrics. 
@@ -207,13 +268,13 @@ def analyze_playlist_with_agents(agents, playlist_data, tracks_with_lyrics, anal
     response = None
     try:
         messages = [{"role": "user", "content": prompt}]
-        response_obj = gemini_llm.create(messages=messages)
+        response_obj = gemini_llm.chat.completions.create(model="gemini-2.0-flash-lite", messages=messages)
         if response_obj and "choices" in response_obj:
             response = response_obj["choices"][0]["message"]["content"]
         else:
             chat_result = user_proxy.initiate_chat(target_agent, message=prompt)
             for msg in chat_result.chat_history:
-                if msg["role"] == "assistant":
+                if msg["role"] == "user":
                     response = msg["content"]
                     break
     except Exception as e:
@@ -258,7 +319,8 @@ def main():
         return
     
     # Create analysis tabs
-    tab1, tab2, tab3 = st.tabs(["Playlist Info", "Lyrics Analysis", "Tracks"])
+    tab1, tab2, tab3= st.tabs(["Playlist Info", "Tracks List", "Tracks Analyzer"])
+    # tab1 = st.tabs(["Playlist Info"])
     
     with st.spinner("Setting up AutoGen agents..."):
         agents = setup_autogen_agents(gemini_key)
@@ -306,6 +368,9 @@ def main():
             # Update progress
             progress_bar.progress((i + 1) / len(tracks))
     
+     # Concatenate all lyrics 
+    all_lyrics = " ".join([track['lyrics'] for track in tracks_with_lyrics if track.get('lyrics')])
+    
     # Display playlist information in Tab 1
     with tab1:
         if playlist_data.get("images"):
@@ -329,34 +394,75 @@ def main():
             st.subheader("Playlist Analysis (via AutoGen)")
             st.write(analysis)
     
-    # Display lyrics analysis in Tab 2
-    with tab2:
-        with st.spinner("Analyzing lyrics with Autogen..."):
-            st.subheader("Lyrical Analysis (via AutoGen)")
-            lyrics_count = sum(1 for track in tracks_with_lyrics if track["lyrics"] != "Lyrics not found")
-            st.write(f"Found lyrics for {lyrics_count} out of {len(tracks_with_lyrics)} tracks")
-            
-            if lyrics_count > 0:
-                lyrics_analysis = analyze_playlist_with_agents(agents, playlist_data, tracks_with_lyrics, "lyrics")
-                st.write(lyrics_analysis)
-            else:
-                st.warning("No lyrics found to analyze")
+        st.subheader("Lyrics Word Cloud")
+        if all_lyrics:
+            wordcloud = generate_wordcloud(all_lyrics)
+            fig, ax = plt.subplots(figsize=(10, 5))
+            ax.imshow(wordcloud, interpolation='bilinear')
+            ax.axis("off")
+            st.pyplot(fig)
+        else:
+            st.warning("No lyrics available to generate a word cloud.")
     
-    # Display tracks in Tab 3
-    with tab3:
+    # Display tracks in Tab 2
+    with tab2:
         st.subheader("Tracks in Playlist")
         
-        for i, track in enumerate(tracks_with_lyrics):
+        # Left: Track display | Right: Analysis result
+        col1, col2 = st.columns(2)
+        
+        filter_text = st.text_input("Filter by song title or artist", "", placeholder="Type to filter...")
+
+        filtered_tracks = [
+            track for track in tracks_with_lyrics
+            if filter_text.lower() in track['title'].lower() or filter_text.lower() in track['artist'].lower()
+        ] if filter_text else tracks_with_lyrics
+        
+        for i, track in enumerate(filtered_tracks):
             with st.expander(f"{i+1}. {track['title']} - {track['artist']}"):
-                cols = st.columns(1)
-                
-                with cols[0]:
-                    if track['lyrics'] != "Lyrics not found":
-                        # Display first few lines of lyrics
-                        lyrics_preview = "\n".join(track['lyrics'].split("\n")[:10])
-                        st.markdown(f"**Lyrics Preview:**\n```\n{lyrics_preview}\n```")
-                    else:
-                        st.info("Lyrics not found")
+                if track['lyrics'] != "Lyrics not found":
+                    lyrics_preview = "\n".join(track['lyrics'].split("\n")[:10])
+                    st.markdown(f"**Lyrics Preview:**\n```\n{lyrics_preview}\n```")
+                else:
+                    st.info("Lyrics not found.")
+
+    # Display word cloud in Tab 3
+    with tab3:
+        st.subheader("🔍 Analyze Individual Song")
+
+        available_tracks = [
+            f"{t['title']} - {t['artist']}" for t in tracks_with_lyrics if t['lyrics'] != "Lyrics not found"
+        ]
+
+        selected_song = st.selectbox("Select a track with lyrics", available_tracks)
+
+        if selected_song and st.button("Analyze Song"):
+            selected_track = next(
+                t for t in tracks_with_lyrics
+                if f"{t['title']} - {t['artist']}" == selected_song
+            )
+
+            st.markdown(f"### ✨ {selected_track['title']} - {selected_track['artist']}")
+
+
+            col1, col2 = st.columns(2)
+
+            with col1:
+                wc = generate_wordcloud(selected_track["lyrics"])
+                fig, ax = plt.subplots(figsize=(4, 4))
+                ax.imshow(wc, interpolation='bilinear')
+                ax.axis("off")
+                st.pyplot(fig)
+
+            with col2:
+                sentiments = compute_sentiment_scores(selected_track["lyrics"])
+                fig = plot_mood_radar(sentiments)
+                st.pyplot(fig)
+
+            result = analyze_playlist_with_agents(agents, playlist_data, [selected_track], "lyrics")
+            st.markdown("**Lyrics Analysis Result:**")
+            st.write(result)
+
 
 if __name__ == "__main__":
     main()
