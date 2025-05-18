@@ -11,6 +11,10 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from gemini_adapter import GeminiLLM
 from autogen import AssistantAgent, UserProxyAgent, GroupChat, GroupChatManager
+from opencc import OpenCC
+
+# Initialize OpenCC converter for Simplified to Traditional Chinese
+chinese_converter = OpenCC('s2t')
 
 # Title and page configuration
 st.set_page_config(page_title="Spotify Lyrics Analyzer with Autogen", layout="wide")
@@ -96,7 +100,7 @@ def get_playlist_details(access_token, playlist_id):
         return {}
 
 # Function to get lyrics
-def get_lyrics(artist, title):
+def get_lyrics_en(artist, title):
     formatted_artist = artist.strip().lower().replace(" ", "%20")
     formatted_title = title.strip().lower().replace(" ", "%20")
     
@@ -109,6 +113,88 @@ def get_lyrics(artist, title):
             return None
     except Exception:
         return None
+    
+def get_lyrics_zh(artist, title):
+    """
+    Get Chinese lyrics from NetEase Cloud Music (unofficial API), and convert to Traditional Chinese.
+
+    Args:
+        artist (str): Artist name.
+        title (str): Song title.
+
+    Returns:
+        str or None: Traditional Chinese lyrics if found, else None.
+    """
+    formatted_artist = artist.strip().lower().replace(" ", "%20")
+    formatted_title = title.strip().lower().replace(" ", "%20")
+
+    # Step 1: search song
+    search_url = "http://music.163.com/api/search/get"
+    params = {
+        "s": f"{formatted_title} {formatted_artist}",
+        "type": 1,
+        "limit": 1
+    }
+
+    try:
+        res = requests.post(search_url, data=params)
+        result = res.json()
+        if "result" not in result or "songs" not in result["result"] or not result["result"]["songs"]:
+            return None
+        song_id = result["result"]["songs"][0]["id"]
+    except Exception:
+        return None
+
+    # Step 2: fetch lyrics
+    lyric_url = f"http://music.163.com/api/song/lyric?os=pc&id={song_id}&lv=-1&kv=-1&tv=-1"
+    try:
+        lyric_res = requests.get(lyric_url)
+        lyrics_json = lyric_res.json()
+
+        if "lrc" not in lyrics_json or "lyric" not in lyrics_json["lrc"]:
+            return None
+
+        raw_lyrics = lyrics_json["lrc"]["lyric"]
+        if "纯音乐" in raw_lyrics:
+            return None
+
+        # Remove timestamps
+        lyrics = re.sub(r'\[\s*\d{2}\s*:\s*\d{2}(?:\.\d{1,3})?\s*\]', '', raw_lyrics)
+
+        # Remove common metadata lines
+        pattern = r'(作词|词|作曲|曲|编曲|制作人|母帶|混音|Studios|工程 師|监制|Music|OP|演唱|錄音師|制作公司|混音|吉他|和声|錄音室|制作|维伴音|京延|编写)\s*[:：].*'
+        lyrics_lines = lyrics.splitlines()
+        filtered_lines = [line.strip() for line in lyrics_lines if not re.match(pattern, line.strip()) and line.strip()]
+
+        simplified_lyric = ' '.join(filtered_lines)
+        traditional_lyric = chinese_converter.convert(simplified_lyric)
+        traditional_lyric = traditional_lyric.replace("咪", "夢")  # Fix for misconverted character
+        return traditional_lyric
+
+    except Exception:
+        return None
+    
+def get_lyrics_auto(artist: str, title: str) -> str | None:
+    """
+    Automatically get lyrics: try English source first, fallback to Chinese if not found.
+
+    Args:
+        artist (str): Artist name.
+        title (str): Song title.
+
+    Returns:
+        str or None: Lyrics text (English or Traditional Chinese) if found, else None.
+    """
+    lyrics = get_lyrics_en(artist, title)
+    if lyrics:
+        return lyrics
+
+    lyrics = get_lyrics_zh(artist, title)
+    if lyrics:
+        return lyrics
+
+    return None
+
 
 def setup_autogen_agents(gemini_api_key):
     gemini_llm = GeminiLLM(api_key=gemini_api_key)
@@ -292,7 +378,7 @@ def main():
             title = track["name"]
             
             # Get lyrics (if available)
-            lyrics = get_lyrics(artist, title)
+            lyrics = get_lyrics_auto(artist, title)
             
             tracks_with_lyrics.append({
                 "id": track_id,
