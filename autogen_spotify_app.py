@@ -11,15 +11,12 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from openai import OpenAI
 from autogen import AssistantAgent, UserProxyAgent, GroupChat, GroupChatManager
-<<<<<<< HEAD
 from wordcloud import WordCloud
 from textblob import TextBlob
-=======
 from opencc import OpenCC
 
 # Initialize OpenCC converter for Simplified to Traditional Chinese
 chinese_converter = OpenCC('s2t')
->>>>>>> origin/feature/chinese-lyrics
 
 # Title and page configuration
 st.set_page_config(page_title="Spotify Lyrics Analyzer with Autogen", layout="wide")
