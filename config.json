@@ -1,0 +1,9 @@
+{
+    "config_list": [
+        {
+            "model": "gemini-2.0-flash-lite",
+            "api_key": "AIzaSyBT-j55lWkh5Mz9_RrSwpCaaagDPcCDjpI",
+            "base_url": "https://generativelanguage.googleapis.com/v1beta/"
+        }
+    ]
+}
