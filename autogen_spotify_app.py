@@ -12,7 +12,6 @@ import matplotlib.pyplot as plt
 from openai import OpenAI
 from autogen import AssistantAgent, UserProxyAgent, GroupChat, GroupChatManager
 from wordcloud import WordCloud
-from textblob import TextBlob
 from opencc import OpenCC
 
 # Initialize OpenCC converter for Simplified to Traditional Chinese
