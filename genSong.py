@@ -77,7 +77,7 @@ def start_ngrok():
     except:
         pass
 
-    ngrok_path = "/opt/homebrew/bin/ngrok"
+    ngrok_path = "/usr/local/bin/ngrok"
     subprocess.Popen([ngrok_path, "http", str(callback_port)], stdout=subprocess.DEVNULL)
     time.sleep(2)
     try:
