@@ -1,0 +1,40 @@
+{
+  "code": 200,
+  "data": {
+    "callbackType": "complete",
+    "data": [
+      {
+        "audio_url": "https://apiboxfiles.erweima.ai/ZmU2MWQwNTYtOGE2Mi00NzFiLThkZTgtODk0M2YzNzBlODNk.mp3",
+        "createTime": 1747668233039,
+        "duration": 128.88,
+        "id": "fe61d056-8a62-471b-8de8-8943f370e83d",
+        "image_url": "https://apiboxfiles.erweima.ai/ZmU2MWQwNTYtOGE2Mi00NzFiLThkZTgtODk0M2YzNzBlODNk.jpeg",
+        "model_name": "chirp-v3-5",
+        "prompt": "",
+        "source_audio_url": "https://cdn1.suno.ai/fe61d056-8a62-471b-8de8-8943f370e83d.mp3",
+        "source_image_url": "https://cdn2.suno.ai/image_fe61d056-8a62-471b-8de8-8943f370e83d.jpeg",
+        "source_stream_audio_url": "https://cdn1.suno.ai/fe61d056-8a62-471b-8de8-8943f370e83d.mp3",
+        "stream_audio_url": "https://mfile.erweima.ai/ZmU2MWQwNTYtOGE2Mi00NzFiLThkZTgtODk0M2YzNzBlODNk",
+        "tags": "COUNTRY",
+        "title": "NTHU"
+      },
+      {
+        "audio_url": "https://apiboxfiles.erweima.ai/ZmZlOGYzYTktYzFmNy00YWZlLTgyZGQtNmE5ZDQ3Zjk1NDU1.mp3",
+        "createTime": 1747668233039,
+        "duration": 168.68,
+        "id": "ffe8f3a9-c1f7-4afe-82dd-6a9d47f95455",
+        "image_url": "https://apiboxfiles.erweima.ai/ZmZlOGYzYTktYzFmNy00YWZlLTgyZGQtNmE5ZDQ3Zjk1NDU1.jpeg",
+        "model_name": "chirp-v3-5",
+        "prompt": "",
+        "source_audio_url": "https://cdn1.suno.ai/ffe8f3a9-c1f7-4afe-82dd-6a9d47f95455.mp3",
+        "source_image_url": "https://cdn2.suno.ai/image_ffe8f3a9-c1f7-4afe-82dd-6a9d47f95455.jpeg",
+        "source_stream_audio_url": "https://cdn1.suno.ai/ffe8f3a9-c1f7-4afe-82dd-6a9d47f95455.mp3",
+        "stream_audio_url": "https://mfile.erweima.ai/ZmZlOGYzYTktYzFmNy00YWZlLTgyZGQtNmE5ZDQ3Zjk1NDU1",
+        "tags": "COUNTRY",
+        "title": "NTHU"
+      }
+    ],
+    "task_id": "1774b3c0d313022da810535821a2b76d"
+  },
+  "msg": "All generated successfully."
+}
