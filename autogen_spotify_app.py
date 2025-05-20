@@ -326,6 +326,22 @@ def plot_mood_radar(mood_dict):
 
     return fig
 
+def logout_spotify():
+    """Clear Spotify authentication cache and session state"""
+    try:
+        # Remove the Spotify token cache file
+        if os.path.exists(".spotify_cache"):
+            os.remove(".spotify_cache")
+            
+        # Clear relevant session state
+        keys_to_clear = ['token_info', 'playlist_data', 'tracks_with_lyrics', 'agents', 'analysis_ready']
+        for key in keys_to_clear:
+            if key in st.session_state:
+                del st.session_state[key]
+                
+    except Exception as e:
+        st.error(f"Error during logout: {e}")
+
 def setup_autogen_agents(gemini_api_key):
     gemini_llm = OpenAI(api_key=gemini_api_key, base_url="https://generativelanguage.googleapis.com/v1beta/")
 
@@ -603,8 +619,17 @@ def playlist_oauth_flow():
         sp = get_spotify_client()
 
         if sp:
+            st.session_state['token_info'] = True
+
+            user_col, button_col = st.columns([3, 1])
+
             user = sp.current_user()
-            st.success(f"Logged in as: {user['display_name']}")
+            with user_col:
+                st.success(f"Logged in as: {user['display_name']}")
+            with button_col:
+                if st.button("Logout", key="oauth_logout_button"):
+                    logout_spotify()
+                    st.rerun()
 
             playlists = sp.current_user_playlists()
             playlist_names = [pl["name"] for pl in playlists["items"]]
@@ -728,7 +753,7 @@ def main():
         st.session_state['analysis_ready'] = False
     if 'active_tab' not in st.session_state:
         st.session_state['active_tab'] = 0
-    
+
     # Check if we have analysis data from a previous run
     if st.session_state.get('analysis_ready'):
         # Display results using tabs
