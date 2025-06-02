@@ -3,7 +3,7 @@ from ui.sidebar import render_sidebar
 from core.client_flow import playlist_client_flow
 from core.oauth_flow import playlist_oauth_flow
 from core.music_cluster import render_music_clusters_graph
-from core.spotify import search_spotify_tracks
+from core.spotify import search_spotify_tracks, playback
 from ui.tabs import display_playlist_info, display_tracks_list, display_track_analyzer
 from ui.chatbot import music_chatbot_ui
 from core.markdown_extract import show_readme
@@ -71,10 +71,16 @@ def main():
             search_spotify_tracks()
         else:
             with st.container(key="readme_content"):
-                show_readme("./data/content.md")
+                intro_tab, bot_tab = st.tabs(["HomePage", "Chatbot Info"])
+                with intro_tab:
+                    show_readme("./data/content.md")
+                with bot_tab:
+                    show_readme("./data/chatbot_info.md")
+                    
         
     with right_sidebar:
         with st.container(key="rightbar_container"):
+            playback()
             if 'tracks_with_lyrics' in st.session_state and 'agents' in st.session_state:
                 music_chatbot_ui(st.session_state['agents'], st.session_state['tracks_with_lyrics'])
             else:

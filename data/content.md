@@ -8,8 +8,6 @@
 
 *Say goodbye to guesswork ❌ and hello to a personalized music journey where data meets creativity. 🎨*
 
----
-
 ### ✨ Features That Make Your Music Come Alive
 
 - **🖥️ Streamlit-Powered User Interface**  
