@@ -69,6 +69,12 @@ def generate_wordcloud(text):
         width=800, height=400, background_color='white', font_path="TaipeiSansTCBeta-Regular.ttf"
     ).generate(" ".join(words))
 
+def generate_wordcloud_for_song(text):
+    words = jieba.cut(text)
+    return WordCloud(
+        width=268, height=229, background_color='white' , font_path="TaipeiSansTCBeta-Regular.ttf"
+    ).generate(" ".join(words))
+
 def compute_sentiment_scores(lyrics):
     if not lyrics:
         return {e: 0.5 for e in ["joy", "sadness", "anger", "fear", "love", "surprise"]}

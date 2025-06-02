@@ -53,7 +53,7 @@ def playlist_list(sp):
                 else:
                     st.image("https://via.placeholder.com/50", width=40)
             with playlist_name:
-                if st.button(f"{album['name']}", key=f"track_btn_{i}"):
+                if st.button(f"{album['name']}", key=f"album_btn_{i}"):
                     st.session_state['active_tab'] = 0
                     with st.spinner("Fetching playlist data..."):
                         try:
@@ -79,7 +79,7 @@ def playlist_list(sp):
             # Custom CSS for playlist list buttons
             st.markdown(f"""
                 <style>
-                .st-key-track_btn_{i} [data-testid="stBaseButton-secondary"]{{
+                .st-key-album_btn_{i} [data-testid="stBaseButton-secondary"]{{
                     border-radius: 4px; /* Less rounded corners */
                     border: 1px solid rgba(255, 255, 255, 0.2); /* Subtle border */
                     background-color: rgba(255, 255, 255, 0.05); /* Semi-transparent background */

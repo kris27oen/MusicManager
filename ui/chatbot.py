@@ -117,6 +117,7 @@ def music_chatbot_ui(agents, tracks_with_lyrics):
             padding: 15px;
             padding-top: 5px;
             overflow-y: none;
+            margin-left: 20px;
         }
         .user-message {
             background-color: rgba(255, 255, 255, 0.1);

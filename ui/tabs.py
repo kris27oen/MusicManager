@@ -2,7 +2,33 @@
 import streamlit as st
 import matplotlib.pyplot as plt
 from core.autogen import analyze_playlist_with_agents
-from core.lyrics import generate_wordcloud, compute_sentiment_scores, plot_mood_radar
+from core.lyrics import generate_wordcloud, generate_wordcloud_for_song, compute_sentiment_scores, plot_mood_radar
+
+def analyze_result(selected_track, playlist_data, agents):
+    st.markdown(f"### ✨ {selected_track['title']} - {selected_track['artist']}")
+    with st.spinner("Analyzing lyrics..."):
+        result = analyze_playlist_with_agents(agents, playlist_data, [selected_track], "lyrics")
+        st.write(result)
+        
+    col1, col2 = st.columns(2)
+    with col1:
+        try:
+            wc = generate_wordcloud_for_song(selected_track["lyrics"])
+            fig, ax = plt.subplots(figsize=(4, 4))
+            ax.imshow(wc, interpolation='bilinear')
+            ax.axis("off")
+            st.pyplot(fig)
+        except Exception as e:
+            st.error(f"Error generating word cloud: {e}")
+
+    with col2:
+        try:
+            sentiments = compute_sentiment_scores(selected_track["lyrics"])
+            fig = plot_mood_radar(sentiments)
+            st.pyplot(fig)
+        except Exception as e:
+            st.error(f"Error generating sentiment analysis: {e}")
+            
 
 def display_playlist_info(playlist_data, tracks_with_lyrics, agents):
     st.session_state['active_tab'] = 0
@@ -40,6 +66,7 @@ def display_playlist_info(playlist_data, tracks_with_lyrics, agents):
     else:
         st.warning("No lyrics available to generate a word cloud.")
 
+
 def display_tracks_list(tracks_with_lyrics):
     st.subheader("Tracks in Playlist")
     st.session_state['active_tab'] = 1
@@ -56,6 +83,7 @@ def display_tracks_list(tracks_with_lyrics):
                 st.markdown(f"**Lyrics Preview:**\n```{track['lyrics'][:500]}\n```")
             else:
                 st.info("Lyrics not found")
+
 
 def display_track_analyzer(playlist_data, tracks_with_lyrics, agents):
     st.subheader("🔍 Analyze Individual Song")
@@ -74,29 +102,4 @@ def display_track_analyzer(playlist_data, tracks_with_lyrics, agents):
             t for t in tracks_with_lyrics
             if f"{t['title']} - {t['artist']}" == selected_song
         )
-
-        st.markdown(f"### ✨ {selected_track['title']} - {selected_track['artist']}")
-        col1, col2 = st.columns(2)
-
-        with col1:
-            try:
-                wc = generate_wordcloud(selected_track["lyrics"])
-                fig, ax = plt.subplots(figsize=(4, 4))
-                ax.imshow(wc, interpolation='bilinear')
-                ax.axis("off")
-                st.pyplot(fig)
-            except Exception as e:
-                st.error(f"Error generating word cloud: {e}")
-
-        with col2:
-            try:
-                sentiments = compute_sentiment_scores(selected_track["lyrics"])
-                fig = plot_mood_radar(sentiments)
-                st.pyplot(fig)
-            except Exception as e:
-                st.error(f"Error generating sentiment analysis: {e}")
-
-        with st.spinner("Analyzing lyrics..."):
-            result = analyze_playlist_with_agents(agents, playlist_data, [selected_track], "lyrics")
-            st.markdown("**Lyrics Analysis Result:**")
-            st.write(result)
+        analyze_result(selected_track, playlist_data, agents)
