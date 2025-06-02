@@ -18,8 +18,8 @@ def logout_spotify():
 def get_spotify_auth():
     try:
         # Explicitly access secrets and verify they exist
-        client_id = st.secrets["SPOTIFY_CLIENT_ID"]
-        client_secret = st.secrets["SPOTIFY_CLIENT_SECRET"]
+        client_id = st.session_state.get('spotify_client_id')
+        client_secret = st.session_state.get('spotify_client_secret')
         redirect_uri = st.secrets["SPOTIFY_REDIRECT_URI"]
         print(client_id, client_secret, redirect_uri)  # Debugging line
         
@@ -50,14 +50,21 @@ def get_spotify_client():
 
         if not token_info:
             auth_url = sp_oauth.get_authorize_url()
-            st.write("Please log in to Spotify:")
-            st.markdown(f"[Click here to authorize]({auth_url})", unsafe_allow_html=True)
-
-            query_params = st.query_params
-            if "code" in query_params:
-                code = query_params["code"]
-                token_info = sp_oauth.get_access_token(code)
-                print("Token info after authorization:", token_info)  # Debugging line
+            if st.button("Login to Spotify", key="oauth_authorize_button"):
+                st.components.v1.html(f"<script>window.open('{auth_url}', '_blank')</script>", height=0)
+                query_params = st.query_params
+                if "code" in query_params:
+                    code = query_params["code"]
+                    token_info = sp_oauth.get_access_token(code)
+                    print("Token info after authorization:", token_info)  # Debugging line
+            st.markdown(f"""
+                <style>
+                .st-key-oauth_authorize_button [data-testid="stBaseButton-secondary"] {{
+                    text-align: center;
+                    width: 100%;
+                }}
+                </style>       
+            """, unsafe_allow_html=True)
 
         if token_info:
             sp = spotipy.Spotify(auth_manager=sp_oauth)
@@ -135,3 +142,4 @@ def playlist_oauth_flow():
 
     except Exception as e:
         st.error(f"Error in OAuth flow: {str(e)}")
+    
