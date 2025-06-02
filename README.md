@@ -1,15 +1,17 @@
-# 🎵 AutoGen Lyrics
+# 🎵 Music Assistant
 
-This project uses AutoGen with Gemini Pro to generate song lyrics based on user input. It demonstrates how to set up and run a conversational AI agent that creates customized lyrics.
+This project uses AutoGen with Gemini Pro to manage user's playlist from spotify. 
 
 [![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://autogenlyrics-krgsknod3xugbb6mghgokr.streamlit.app/)
 
 ## 🚀 Features
-
-- Integration with Gemini Pro via API
-- AutoGen multi-agent chat setup
-- Customizable prompts for lyric generation
-- CLI-based interaction
+- Streamlit UI-based interaction
+- Integrate chatbot and song analyzer with Gemini model via Autogen API
+- Spotify authentication (Login) with user's account to access their playlist
+- Playlist analysis with word cloud and mood graph
+- Specific song analysis with word cloud and mood graph
+- Chatbot as an music assistant that can recommend music and QnA interaction
+- Interactive song web cluster like graph database connection
 
 ## 🛠️ Setup
 
@@ -40,5 +42,5 @@ pip install -r requirements.txt
 5. **Run the script**
 
 ```bash
-.\autogen-env\Scripts\python.exe -m streamlit run .\autogen_spotify_app.py
+streamlit run app.py
 ```
