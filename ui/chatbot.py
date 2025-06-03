@@ -1,7 +1,7 @@
 import re
 import streamlit as st
 from core.autogen import setup_autogen_agents
-from core.spotify import (
+from core.playback import (
     search_tracks, add_track_to_queue, add_track_to_playlist,
     create_playlist, play_playlist, pause_playback, next_track, get_spotify_client, play_track 
 )

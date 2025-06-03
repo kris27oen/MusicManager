@@ -29,7 +29,8 @@ def playlist_client_flow():
             return
 
         with input_col:
-            if st.button(" ", key="client_analyze_button"):
+            analyze_button = st.button(" ", key="client_analyze_button")
+            if analyze_button:
                 st.session_state['active_tab'] = 0
 
                 # Full-screen spinner

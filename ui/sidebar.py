@@ -7,6 +7,7 @@ from core.client_flow import playlist_client_flow
 
 def account_info():
     sp = get_spotify_client()
+    st.session_state['sp_info'] = True
     if sp:
         user = sp.current_user()
         

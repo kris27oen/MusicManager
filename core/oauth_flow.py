@@ -24,7 +24,6 @@ def get_spotify_auth():
         print(client_id, client_secret, redirect_uri)  # Debugging line
         
         if not all([client_id, client_secret, redirect_uri]):
-            st.error("Missing Spotify credentials in secrets.toml")
             return None
             
         return SpotifyOAuth(
@@ -50,13 +49,15 @@ def get_spotify_client():
 
         if not token_info:
             auth_url = sp_oauth.get_authorize_url()
-            if st.button("Login to Spotify", key="oauth_authorize_button"):
+            login_button = st.button("Login to Spotify", key="oauth_login_button")
+            if login_button:
                 st.components.v1.html(f"<script>window.open('{auth_url}', '_blank')</script>", height=0)
                 query_params = st.query_params
                 if "code" in query_params:
                     code = query_params["code"]
                     token_info = sp_oauth.get_access_token(code)
                     print("Token info after authorization:", token_info)  # Debugging line
+                    st.rerun()
             st.markdown(f"""
                 <style>
                 .st-key-oauth_authorize_button [data-testid="stBaseButton-secondary"] {{
