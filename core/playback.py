@@ -44,6 +44,8 @@ def get_current_playback_uri(access_token):
     headers = {"Authorization": f"Bearer {access_token}"}
     try:
         response = requests.get("https://api.spotify.com/v1/me/player/currently-playing", headers=headers)
+        print("Response status code:", response.status_code)  # Debugging line
+        print("Response content:", response.content)  # Debugging line
         if response.status_code == 200:
             data = response.json()
             item = data.get("item")
