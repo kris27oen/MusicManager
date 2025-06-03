@@ -109,9 +109,9 @@ def settings_popup():
     st.selectbox("Language", ["English", "繁體中文"], index=0)
 
     st.header("API Configuration")
-    spotify_client_id = st.text_input("Spotify Client ID", type="password", value="b9e0979d54c449d4a1b7f23a1be1d329")
-    spotify_client_secret = st.text_input("Spotify Client Secret", type="password", value="03559d2dc6b643e8af412d5930ee4ec2")
-    gemini_api_key = st.text_input("Gemini API Key", type="password", value="AIzaSyBT-j55lWkh5Mz9_RrSwpCaaagDPcCDjpI")
+    spotify_client_id = st.text_input("Spotify Client ID", type="password")
+    spotify_client_secret = st.text_input("Spotify Client Secret", type="password")
+    gemini_api_key = st.text_input("Gemini API Key", type="password")
 
     if st.button("Save API Keys"):
         st.success("API keys saved!")
