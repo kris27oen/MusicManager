@@ -30,7 +30,7 @@ def get_spotify_auth():
             client_id=client_id,
             client_secret=client_secret,
             redirect_uri=redirect_uri,
-            scope="playlist-read-private playlist-read-collaborative",
+            scope="playlist-read-private playlist-read-collaborative user-read-playback-state user-modify-playback-state user-read-currently-playing",
             cache_path="./.spotify_cache",  # Explicitly set cache path
             username=None,  # Set to None to use the authenticated user's ID
             show_dialog=True

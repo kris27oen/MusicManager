@@ -7,8 +7,8 @@ from core.client_flow import playlist_client_flow
 
 def account_info():
     sp = get_spotify_client()
-    st.session_state['sp_info'] = True
     if sp:
+        st.session_state['sp_info'] = False
         user = sp.current_user()
         
         with st.container(key="sidebar_user_info"):
@@ -39,6 +39,7 @@ def account_info():
         return sp
     
     else:
+        st.session_state['sp_info'] = True
         return None
 
 def playlist_list(sp):
