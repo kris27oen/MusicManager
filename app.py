@@ -1,12 +1,13 @@
 import streamlit as st
-from ui.sidebar import render_sidebar
 from core.client_flow import playlist_client_flow
-from core.oauth_flow import playlist_oauth_flow
+from core.oauth_flow import playlist_oauth_flow, get_spotify_client
 from core.music_cluster import render_music_clusters_graph
-from core.spotify import search_spotify_tracks, playback
+from core.spotify import search_spotify_tracks
+from core.playback import playback
+from core.markdown_extract import show_readme
+from ui.sidebar import render_sidebar
 from ui.tabs import display_playlist_info, display_tracks_list, display_track_analyzer
 from ui.chatbot import music_chatbot_ui
-from core.markdown_extract import show_readme
 
 # st.set_page_config(page_title="Music Assistant", layout="wide")
 
@@ -19,6 +20,8 @@ def main():
         st.session_state['active_tab'] = 0
     if 'search_songs' not in st.session_state:
         st.session_state['search_songs'] = None
+    if 'sp_info' not in st.session_state:
+        st.session_state['sp_info'] = False
         
     main_col, right_sidebar = st.columns([8, 3])
     with main_col:
@@ -68,7 +71,10 @@ def main():
                 )
         elif st.session_state['search_songs']:
             title_placeholder.empty()
-            search_spotify_tracks()
+            if st.session_state.get('spotify_client_id') and st.session_state.get('spotify_client_secret') and st.session_state.get('gemini_api_key') and not st.session_state.get('sp_info'):
+                search_spotify_tracks()
+            else:
+                st.warning("Please authenticate with Spotify to search for songs.")
         else:
             with st.container(key="readme_content"):
                 intro_tab, bot_tab = st.tabs(["HomePage", "Chatbot Info"])
@@ -80,11 +86,14 @@ def main():
         
     with right_sidebar:
         with st.container(key="rightbar_container"):
-            playback()
-            if 'tracks_with_lyrics' in st.session_state and 'agents' in st.session_state:
-                music_chatbot_ui(st.session_state['agents'], st.session_state['tracks_with_lyrics'])
+            if st.session_state.get('spotify_client_id') and st.session_state.get('spotify_client_secret') and st.session_state.get('gemini_api_key') and not st.session_state.get('sp_info'):  
+                playback()
+                if 'tracks_with_lyrics' in st.session_state and 'agents' in st.session_state:
+                    music_chatbot_ui(st.session_state['agents'], st.session_state['tracks_with_lyrics'])
+                else:
+                    music_chatbot_ui(None, None)
             else:
-                music_chatbot_ui(None, None)
+                st.warning("Chatbot and Jukebox are not available. Please authenticate with Spotify to use this feature.")
         
 
 if __name__ == "__main__":
