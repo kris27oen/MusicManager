@@ -138,14 +138,24 @@ def playback():
 
     st.markdown(
         f"""
-        <iframe 
+        <iframe  
             src="{embed_url}" 
-            width="100%" 
-            height="152" 
-            frameborder="0" 
+            width="300 auto"                
+            height="154" 
+            frameborder="-1" 
             allowtransparency="true" 
-            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"
-        </iframe>
+            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+            loading="lazy"
+            style="
+                top: 90px;
+                background-color: transparent; 
+                margin-left: 20px; 
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                border-radius: 20px; 
+                position: fixed;                      
+                z-index: 999;
+            "
+        ></iframe>
         """, 
         unsafe_allow_html=True
     )

@@ -162,7 +162,7 @@ def music_chatbot_ui(agents, tracks_with_lyrics):
 
         # Chat display container
         with st.container(key="chat_container_display"):
-            with st.container(key="chat_display", height=250):
+            with st.container(key="chat_display", height=350):
                 if st.session_state.chat_history:
                     for msg in st.session_state.chat_history[-20:]:
                         if msg["role"] == "user":
@@ -196,8 +196,9 @@ def music_chatbot_ui(agents, tracks_with_lyrics):
         <style>
         .st-key-chat_container {
             position: fixed;
+            bottom: 20px;
             background-color: #262730;
-            border-radius: 10px;
+            border-radius: 20px;
             border: 1px solid rgba(255, 255, 255, 0.2);
             padding: 15px;
             padding-top: 5px;
