@@ -2,7 +2,7 @@
 
 This project uses AutoGen with Gemini Pro to manage user's playlist from spotify. 
 
-[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://autogenlyrics-krgsknod3xugbb6mghgokr.streamlit.app/)
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://musicmanager.streamlit.app/)
 
 ## 🚀 Features
 - Streamlit UI-based interaction
