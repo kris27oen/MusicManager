@@ -35,12 +35,17 @@ autogen-env\Scripts\activate
 pip install -r requirements.txt
 ```
 
-4. **Replace your APIs**
-   Update the autogen_spotify_app.py file with your Spotify API keys.
-   Update the config.json file with your Gemini API key. Make sure that your API key is compatible with the Gemini model being used.
-
-5. **Run the script**
+4. **Run the script**
 
 ```bash
 streamlit run app.py
 ```
+
+## Problem you might encounter during Spotify Authorization Process (Login)
+
+1. When you first open streamlit, you have to always place in your Spotify Client ID, Spotify Client Secret, Gemini API Key.
+2. Click Login and it will redirect you for authorization.
+3. After authorization, you will have to insert your APIs configuration once more as it refresh your API on every authorization.
+4. Click login again, but return from teh authorization page, you should be able to see your playlist by then.
+5. Remember to open your spotify and play the current song to open the jukebox. Also, turn your playlist to public so that the chatbot can see it.
+6. Enjoy !!! 
